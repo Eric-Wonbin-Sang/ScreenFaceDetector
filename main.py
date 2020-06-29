@@ -17,8 +17,8 @@ def main():
 
         temp_image_path = "temp_face.jpg"
 
-        im = pyscreenshot.grab(bbox=(2980, 460, 3080, 600))
-        im.save(temp_image_path)
+        screenshot = pyscreenshot.grab(bbox=(2980, 460, 3080, 600))
+        screenshot.save(temp_image_path)
 
         image = cv2.imread(temp_image_path)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -31,21 +31,24 @@ def main():
             flags=cv2.CASCADE_SCALE_IMAGE
         )
 
-        # print(face_list)
         curr_is_face = len(face_list) != 0
 
         if curr_is_face and not prev_is_face:
+
+            if len(face_profile_list) != 0:
+                face_profile_list[-1].get_target_image().save("Faces/{}.jpg".format(face_profile_list[-1].face_id))
+
             print("--------------------------")
-            print("new prof added - face num {}".format(len(face_profile_list)))
+            print("new prof added - face num {}".format(profile_count := len(face_profile_list) + 1))
             face_profile_list.append(
                 FaceProfile.FaceProfile(
-                    face_id="",
-                    init_image=image
+                    face_id="FaceProfile - {}".format(profile_count),
+                    init_image=screenshot
                 )
             )
         elif curr_is_face and prev_is_face:
             print("\tadding face")
-            face_profile_list[-1].add_image_to_list(image)
+            face_profile_list[-1].add_image_to_list(screenshot)
 
         prev_is_face = curr_is_face
 
